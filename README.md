@@ -14,9 +14,9 @@
 
 ### Architecture
 
-![Search Architecture]()
+![Search Architecture](https://github.com/nhnacademy-be6-code-quest/.github/blob/main/img/search/SearchArchitecture.png)
 
 ### Test
 
-![Search Test]()
+![Search Test](https://github.com/nhnacademy-be6-code-quest/.github/blob/main/img/search/SearchTest.png)
 

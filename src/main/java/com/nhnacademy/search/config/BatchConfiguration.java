@@ -32,6 +32,7 @@ public class BatchConfiguration {
     public Step productUpdateStep() {
         return new StepBuilder("productUpdateStep", jobRepository)
                 .tasklet(productUpdateTasklet(), transactionManager)
+                .allowStartIfComplete(true)
                 .build();
     }
 

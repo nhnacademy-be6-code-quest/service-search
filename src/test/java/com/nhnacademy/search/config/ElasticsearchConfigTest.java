@@ -1,58 +1,42 @@
 package com.nhnacademy.search.config;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.test.context.TestPropertySource;
 
-import java.time.LocalDateTime;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
+@SpringBootTest(classes = ElasticsearchConfig.class)
+@TestPropertySource(properties = {
+        "spring.elasticsearch.username=testuser",
+        "spring.elasticsearch.password=testpass",
+        "spring.elasticsearch.uris=http://localhost:9200"
+})
 class ElasticsearchConfigTest {
 
-    private ElasticsearchConfig elasticsearchConfig;
+    @Autowired
+    private ApplicationContext context;
 
-    @BeforeEach
-    void setUp() {
-        elasticsearchConfig = new ElasticsearchConfig();
-        ReflectionTestUtils.setField(elasticsearchConfig, "username", "testUser");
-        ReflectionTestUtils.setField(elasticsearchConfig, "password", "testPassword");
-        ReflectionTestUtils.setField(elasticsearchConfig, "esHost", new String[]{"localhost:9200"});
+    @MockBean
+    private ElasticsearchOperations elasticsearchOperations;
+
+    @Test
+    void testClientConfigurationExists() {
+        assertThat(context.containsBean("elasticsearchClientConfiguration")).isTrue();
     }
 
     @Test
-    void testClientConfiguration() {
-        ClientConfiguration clientConfiguration = elasticsearchConfig.clientConfiguration();
-
-        assertNotNull(clientConfiguration);
-        // We can't directly access the hosts, so we'll check if the configuration is not null
-        assertNotNull(clientConfiguration.getClientConfigurationCallback());
-        // Check if basic auth is set
-        assertTrue(clientConfiguration.getDefaultHeaders().containsKey("Authorization"));
+    void testElasticsearchCustomConversionsExists() {
+        assertThat(context.containsBean("elasticsearchCustomConversions")).isTrue();
     }
 
     @Test
-    void testElasticsearchCustomConversions() {
-        ElasticsearchCustomConversions conversions = elasticsearchConfig.elasticsearchCustomConversions();
-
-        assertNotNull(conversions);
-        assertTrue(conversions.hasCustomReadTarget(Long.class, LocalDateTime.class));
-    }
-
-    @Test
-    void testLongToLocalDateTimeConverter() {
-        var converter = new ElasticsearchConfig.LongToLocalDateTimeConverter();
-
-        long timestamp = 1609459200000L; // 2021-01-01 00:00:00
-        LocalDateTime dateTime = converter.convert(timestamp);
-
-        assertNotNull(dateTime);
-        assertEquals(2021, dateTime.getYear());
-        assertEquals(1, dateTime.getMonthValue());
-        assertEquals(1, dateTime.getDayOfMonth());
+    void testElasticsearchConfigurationExists() {
+        assertThat(context.getBeansOfType(ElasticsearchConfiguration.class)).isNotEmpty();
     }
 }

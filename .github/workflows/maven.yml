@@ -52,4 +52,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
-          script: "./search_startup.sh"
+          script: "./CD/main.sh 9091 11091 Search-0.0.1-SNAPSHOT.jar search_log"
